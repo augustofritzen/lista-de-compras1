@@ -132,11 +132,11 @@ input::placeholder {
 }
 
 .form-row input[type="number"] {
-  flex: 2;
+  flex: 1.5;
 }
 
 .form-row select {
-  flex: 2;
+  flex: 2.5;
 }
 
 .btn-adicionar {
@@ -233,7 +233,7 @@ input::placeholder {
   background-color: #1e7e34;
 }
 
-/* Toast */
+/* Notificação Toast */
 .toast {
   visibility: hidden;
   min-width: 220px;
