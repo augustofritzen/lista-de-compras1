@@ -32,6 +32,31 @@ body {
   font-weight: 500;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-change-bg {
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-change-bg:active {
+  background-color: #444;
+}
+
 .logo-header {
   background-color: #2a2a2a;
   color: #ccc;
@@ -54,13 +79,11 @@ body {
   padding: 20px;
   border-radius: 18px;
   
-  /* Imagem de fundo ajustada */
   background-image: url('fundo.jpg');
   background-repeat: no-repeat;
   background-position: center;
-  background-size: contain; /* Ajusta a imagem para caber perfeitamente dentro do container */
+  background-size: contain;
   
-  /* Camada translúcida clara sobre o fundo para manter os textos legíveis */
   background-color: rgba(230, 230, 230, 0.88);
   background-blend-mode: overlay;
 
@@ -204,10 +227,6 @@ input::placeholder {
   font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
-}
-
-.btn-pdf {
-  background-color: #a71d2a;
 }
 
 .btn-texto {
