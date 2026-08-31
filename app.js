@@ -89,7 +89,7 @@ function renderizarLista() {
   });
 }
 
-// Gera o arquivo PDF e aciona a gaveta de compartilhamento direto do celular
+// Tenta compartilhar o PDF via API nativa e cai em fallback caso o WebView não suporte anexos
 async function compartilharPDF() {
   if (itens.length === 0) {
     exibirToast("Adicione itens à lista primeiro!");
@@ -138,28 +138,32 @@ async function compartilharPDF() {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
         title: 'Lista de Compras',
-        text: 'Segue em anexo a Lista de Compras em formato PDF.',
+        text: 'Segue a Lista de Compras em anexo.',
         files: [file]
       });
       exibirToast("PDF compartilhado!");
     } else {
       html2pdf().set(opt).from(element).save();
-      exibirToast("PDF baixado na pasta Downloads!");
+      exibirToast("PDF baixado em Downloads!");
     }
   } catch (error) {
     element.style.display = 'none';
-    console.error("Erro ao gerar/compartilhar PDF:", error);
+    console.error("Erro ao processar PDF:", error);
     exibirToast("Erro ao processar o PDF.");
   }
 }
 
+// Envia a lista como texto formatado diretamente para o WhatsApp
 function enviarWhatsAppTexto() {
   if (itens.length === 0) {
     exibirToast("Adicione itens à lista primeiro!");
     return;
   }
 
-  let mensagem = "*LISTA DE COMPRAS*\n\n";
+  const agora = new Date();
+  const dataFormatada = agora.toLocaleDateString('pt-BR');
+
+  let mensagem = `*LISTA DE COMPRAS - ${dataFormatada}*\n\n`;
   itens.forEach((item, index) => {
     const marcaTexto = item.marca ? ` (${item.marca})` : '';
     mensagem += `${index + 1}. *${item.nome}*${marcaTexto} - ${item.qtd} ${item.medida}\n`;
