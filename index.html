@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lista de Compras - Choperia 737</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Biblioteca html2pdf para geração de PDF em fallback -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-  <!-- Cabeçalho Superior -->
+  <!-- Cabeçalho Superior com Botão de Personalizar Fundo -->
   <header class="top-bar">
     <h1 class="top-title">lista de compras</h1>
-    <div class="logo-header">737</div>
+    <div class="header-actions">
+      <label for="input-bg" class="btn-change-bg" title="Alterar Imagem de Fundo">📷</label>
+      <input type="file" id="input-bg" accept="image/*" onchange="alterarFundo(event)" style="display: none;">
+      <div class="logo-header">737</div>
+    </div>
   </header>
 
   <!-- Container Principal -->
@@ -29,24 +31,25 @@
       <div class="form-group">
         <input type="text" id="marca-item" placeholder="MARCA (OPCIONAL)">
       </div>
-
-      <div class="form-row">
-        <input type="number" id="qtd-item" placeholder="QTD" step="any" min="0.01" required>
-        <select id="medida-item">
-          <option value="UN">UN</option>
-          <option value="KG">KG</option>
-          <option value="BISNAGA">BISNAGA</option>
-          <option value="CX">CX</option>
-          <option value="L">LITROS</option>
-          <option value="PEÇA">PEÇA</option>
-          <option value="PCT">PACOTE</option>
-          <option value="BALDE">BALDE</option>
-          <option value="BALDINHO">BALDINHO</option>
-          <option value="POTE">POTE</option>
-        </select>
-        <button type="submit" class="btn-adicionar">+</button>
-      </div>
-    </form>
+<form>
+  <div class="form-row"> 
+    <input type="number" id="qtd-item" placeholder="QTD" step="any" min="0.01" required> 
+    <select id="medida-item"> 
+      <option value="UN">UN</option> 
+      <option value="KG">KG</option> 
+      <option value="BISNAGA">BISNAGA</option> 
+      <option value="CX">CX</option> 
+      <option value="L">LITROS</option> 
+      <option value="PEÇA">PEÇA</option> 
+      <option value="PCT">PACOTE</option> 
+      <option value="BALDE">BALDE</option> 
+      <option value="BALDINHO">BALDINHO</option> 
+      <option value="POTE">POTE</option> 
+    </select> 
+    <button type="submit" class="btn-adicionar">+</button> 
+  </div> 
+</form>
+     
 
     <!-- Cabeçalho da Lista -->
     <div class="list-header">
@@ -59,33 +62,11 @@
 
     <!-- Botões de Ação -->
     <div class="action-buttons">
-      <button type="button" class="btn-action btn-pdf" onclick="compartilharPDF()">
-        📄 ENVIAR / COMPARTILHAR PDF
-      </button>
       <button type="button" class="btn-action btn-texto" onclick="enviarWhatsAppTexto()">
         💬 ENVIAR VIA TEXTO
       </button>
     </div>
   </main>
-
-  <!-- Template Oculto para Geração do PDF -->
-  <div id="pdf-template" style="display: none; padding: 20px; font-family: Arial, sans-serif;">
-    <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
-      <h2 style="margin: 0; color: #222;">CHOPERIA 737 - LISTA DE COMPRAS</h2>
-      <p id="pdf-data" style="margin: 5px 0 0 0; color: #666; font-size: 14px;"></p>
-    </div>
-    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-      <thead>
-        <tr style="background-color: #f2f2f2;">
-          <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Descrição</th>
-          <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Marca</th>
-          <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Qtd</th>
-          <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Unidade</th>
-        </tr>
-      </thead>
-      <tbody id="pdf-tbody"></tbody>
-    </table>
-  </div>
 
   <!-- Notificação Toast -->
   <div id="toast" class="toast"></div>
