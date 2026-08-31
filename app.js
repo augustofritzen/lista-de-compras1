@@ -1,10 +1,17 @@
 let itens = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Carrega lista salva
   const dadosSalvos = localStorage.getItem('minha_lista_compras');
   if (dadosSalvos) {
     itens = JSON.parse(dadosSalvos);
     renderizarLista();
+  }
+
+  // Carrega fundo personalizado
+  const fundoSalvo = localStorage.getItem('fundo_personalizado');
+  if (fundoSalvo) {
+    aplicarImagemFundo(fundoSalvo);
   }
 });
 
@@ -89,71 +96,7 @@ function renderizarLista() {
   });
 }
 
-// Tenta compartilhar o PDF via API nativa e cai em fallback caso o WebView não suporte anexos
-async function compartilharPDF() {
-  if (itens.length === 0) {
-    exibirToast("Adicione itens à lista primeiro!");
-    return;
-  }
-
-  exibirToast("Gerando PDF...");
-
-  const tbody = document.getElementById('pdf-tbody');
-  tbody.innerHTML = '';
-
-  itens.forEach((item, index) => {
-    const tr = document.createElement('tr');
-    tr.style.backgroundColor = index % 2 === 0 ? '#f9f9f9' : '#ffffff';
-    tr.innerHTML = `
-      <td style="border: 1px solid #ccc; padding: 8px; text-align: left; font-weight: normal;">${item.nome}</td>
-      <td style="border: 1px solid #ccc; padding: 8px; text-align: left; font-weight: normal;">${item.marca || '-'}</td>
-      <td style="border: 1px solid #ccc; padding: 8px; text-align: center; font-weight: normal;">${item.qtd}</td>
-      <td style="border: 1px solid #ccc; padding: 8px; text-align: center; font-weight: normal;">${item.medida}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  const agora = new Date();
-  const dataFormatada = agora.toLocaleDateString('pt-BR');
-  document.getElementById('pdf-data').textContent = `Data: ${dataFormatada}`;
-
-  const element = document.getElementById('pdf-template');
-  element.style.display = 'block';
-
-  const opt = {
-    margin:       10,
-    filename:     `Lista_de_Compras_${dataFormatada.replace(/\//g, '-')}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  try {
-    const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
-    element.style.display = 'none';
-
-    const fileName = `Lista_de_Compras_${dataFormatada.replace(/\//g, '-')}.pdf`;
-    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        title: 'Lista de Compras',
-        text: 'Segue a Lista de Compras em anexo.',
-        files: [file]
-      });
-      exibirToast("PDF compartilhado!");
-    } else {
-      html2pdf().set(opt).from(element).save();
-      exibirToast("PDF baixado em Downloads!");
-    }
-  } catch (error) {
-    element.style.display = 'none';
-    console.error("Erro ao processar PDF:", error);
-    exibirToast("Erro ao processar o PDF.");
-  }
-}
-
-// Envia a lista como texto formatado diretamente para o WhatsApp
+// Envia a lista como texto formatado diretamente para o WhatsApp com data e hora
 function enviarWhatsAppTexto() {
   if (itens.length === 0) {
     exibirToast("Adicione itens à lista primeiro!");
@@ -162,8 +105,9 @@ function enviarWhatsAppTexto() {
 
   const agora = new Date();
   const dataFormatada = agora.toLocaleDateString('pt-BR');
+  const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  let mensagem = `*LISTA DE COMPRAS - ${dataFormatada}*\n\n`;
+  let mensagem = `*LISTA DE COMPRAS*\n📅 _Gerada em: ${dataFormatada} às ${horaFormatada}_\n\n`;
   itens.forEach((item, index) => {
     const marcaTexto = item.marca ? ` (${item.marca})` : '';
     mensagem += `${index + 1}. *${item.nome}*${marcaTexto} - ${item.qtd} ${item.medida}\n`;
@@ -171,6 +115,35 @@ function enviarWhatsAppTexto() {
 
   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
   window.open(url, '_blank');
+}
+
+// Processa a imagem escolhida na galeria do celular
+function alterarFundo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 3 * 1024 * 1024) {
+    exibirToast("Escolha uma imagem menor que 3MB!");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imagemBase64 = e.target.result;
+    localStorage.setItem('fundo_personalizado', imagemBase64);
+    aplicarImagemFundo(imagemBase64);
+    exibirToast("Fundo alterado com sucesso!");
+  };
+
+  reader.readAsDataURL(file);
+}
+
+// Aplica o background no container
+function aplicarImagemFundo(urlImagem) {
+  const container = document.querySelector('.container');
+  if (container) {
+    container.style.backgroundImage = `url('${urlImagem}')`;
+  }
 }
 
 function exibirToast(mensagem) {
