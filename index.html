@@ -3,80 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Compras</title>
+  <title>Lista de Compras - Choperia 737</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Biblioteca html2pdf para geração de PDF em fallback -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <div class="app-container">
-    <h1>LISTA DE COMPRAS</h1>
 
+  <!-- Cabeçalho Superior -->
+  <header class="top-bar">
+    <h1 class="top-title">lista de compras</h1>
+    <div class="logo-header">737</div>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="container">
+    <h2 class="main-title">LISTA DE COMPRAS</h2>
+
+    <!-- Formulário de Entrada -->
     <form id="form-item" onsubmit="adicionarItem(event)">
-      <div class="input-group">
-        <input type="text" id="nome-item" placeholder="DESCRIÇÃO DO ITEM" required autocomplete="off">
+      <div class="form-group">
+        <input type="text" id="nome-item" placeholder="DESCRIÇÃO DO ITEM" required>
       </div>
 
-      <div class="input-group">
-        <input type="text" id="marca-item" placeholder="MARCA (OPCIONAL)" autocomplete="off">
+      <div class="form-group">
+        <input type="text" id="marca-item" placeholder="MARCA (OPCIONAL)">
       </div>
 
-      <div class="input-row">
+      <div class="form-row">
         <input type="number" id="qtd-item" placeholder="QTD" step="any" min="0.01" required>
-        
         <select id="medida-item">
           <option value="UN">UN</option>
           <option value="KG">KG</option>
-          <option value="L">L</option>
-          <option value="M">M</option>
-          <option value="CX">CX</option>
-          <option value="PCT">PCT</option>
-          <option value="PEÇA">PEÇA</option>
-        </select>
-      </div>
 
-      <button type="submit" class="btn-adicionar">ADICIONAR ITEM</button>
+          <option value="CX">CX</option>
+          <option value="L">L</option>
+          <option value="PEÇA">PEÇA</option>
+          <option value="PCT">PCT</option>
+        </select>
+        <button type="submit" class="btn-adicionar">+</button>
+      </div>
     </form>
 
-    <div class="lista-header">
+    <!-- Cabeçalho da Lista -->
+    <div class="list-header">
       <span>ITENS DA LISTA</span>
-      <button onclick="limparLista()" class="btn-limpar">LIMPAR TUDO</button>
+      <button type="button" class="btn-limpar" onclick="limparLista()">LIMPAR TUDO</button>
     </div>
 
+    <!-- Lista Dinâmica de Itens -->
     <ul id="lista-itens"></ul>
 
-    <div class="acoes-container">
-      <button onclick="compartilharPDF()" class="btn-pdf">
+    <!-- Botões de Ação -->
+    <div class="action-buttons">
+      <button type="button" class="btn-action btn-pdf" onclick="compartilharPDF()">
         📄 ENVIAR / COMPARTILHAR PDF
       </button>
-      <button onclick="enviarWhatsAppTexto()" class="btn-whatsapp">
+      <button type="button" class="btn-action btn-texto" onclick="enviarWhatsAppTexto()">
         💬 ENVIAR VIA TEXTO
       </button>
     </div>
-  </div>
+  </main>
 
-  <div id="toast" class="toast"></div>
-
-  <!-- Modelo oculto para renderização da folha PDF -->
-  <div id="pdf-template" style="display: none;">
-    <div style="padding: 20px; font-family: Arial, sans-serif; color: #1a1a1a;">
-      <h2 style="text-align: center; color: #2e7d32; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; margin-bottom: 20px;">
-        LISTA DE COMPRAS
-      </h2>
-      <p id="pdf-data" style="text-align: right; font-size: 12px; color: #666; margin-bottom: 15px;"></p>
-      <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <thead>
-          <tr style="background-color: #2e7d32; color: #ffffff;">
-            <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">ITEM</th>
-            <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">MARCA</th>
-            <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">QTD</th>
-            <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">MEDIDA</th>
-          </tr>
-        </thead>
-        <tbody id="pdf-tbody">
-        </tbody>
-      </table>
+  <!-- Template Oculto para Geração do PDF -->
+  <div id="pdf-template" style="display: none; padding: 20px; font-family: Arial, sans-serif;">
+    <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
+      <h2 style="margin: 0; color: #222;">CHOPERIA 737 - LISTA DE COMPRAS</h2>
+      <p id="pdf-data" style="margin: 5px 0 0 0; color: #666; font-size: 14px;"></p>
     </div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <thead>
+        <tr style="background-color: #f2f2f2;">
+          <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Descrição</th>
+          <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Marca</th>
+          <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Qtd</th>
+          <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Unidade</th>
+        </tr>
+      </thead>
+      <tbody id="pdf-tbody"></tbody>
+    </table>
   </div>
+
+  <!-- Notificação Toast -->
+  <div id="toast" class="toast"></div>
 
   <script src="app.js"></script>
 </body>
