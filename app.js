@@ -149,14 +149,19 @@ function obterEmojiItem(nome) {
   return '\u{1F539}'; // 🔹 Emoji padrão
 }
 
-// Formata e envia a lista com emojis inteligentes no WhatsApp
+// Formata e envia a lista apenas com a data no WhatsApp
 function enviarWhatsAppTexto() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de enviar!');
     return;
   }
 
+  // Obtenção apenas da data atual
+  const agora = new Date();
+  const dataFormatada = agora.toLocaleDateString('pt-BR');
+
   let texto = "*LISTA DE COMPRAS - CHOPERIA 737*\n";
+  texto += `📅 *Data:* ${dataFormatada}\n`;
   texto += "-----------------------------------\n\n";
 
   lista.forEach(item => {
