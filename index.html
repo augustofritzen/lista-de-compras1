@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Compras - Choperia 737</title>
+  <title>Lista de Compras</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="container">
     <h1>Lista de Compras</h1>
-    <h2>Choperia 737</h2>
+    
+    <!-- Campo do Nome da Empresa Editável -->
+    <div class="empresa-container">
+      <input type="text" id="nome-empresa" placeholder="Nome do Estabelecimento" value="Choperia 737">
+    </div>
 
     <!-- Formulário para adicionar itens -->
     <form id="form-item" onsubmit="adicionarItem(event)">
@@ -45,8 +49,8 @@
         📲 Enviar no WhatsApp
       </button>
 
-      <button type="button" class="btn-txt" onclick="exportarBlocoDeNotas()">
-        📄 Salvar no Bloco de Notas
+      <button type="button" class="btn-excel" onclick="exportarPlanilhaCSV()">
+        📊 Gerar Planilha Excel (.csv)
       </button>
 
       <div class="botoes-secundarios">
