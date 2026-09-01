@@ -16,7 +16,7 @@ body {
   padding: 15px;
 }
 
-/* Container Principal (Largura 600px) */
+/* Container Principal */
 .container {
   width: 100%;
   max-width: 600px;
@@ -32,7 +32,7 @@ body {
   position: relative;
 }
 
-/* Títulos */
+/* Títulos e Empresa Editável */
 h1 {
   font-size: 1.6rem;
   text-align: center;
@@ -40,12 +40,29 @@ h1 {
   margin-bottom: 2px;
 }
 
-h2 {
-  font-size: 1.1rem;
-  text-align: center;
+.empresa-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+#nome-empresa {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed #f39c12;
+  border-radius: 0;
   color: #f39c12;
-  margin-bottom: 12px;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
+  padding: 4px;
+}
+
+#nome-empresa:focus {
+  border-bottom: 1px solid #f39c12;
+  outline: none;
 }
 
 /* Formulário de Inserção */
@@ -65,7 +82,6 @@ h2 {
   gap: 8px;
 }
 
-/* Campos de Texto, Números e Select */
 input[type="text"],
 input[type="number"],
 select {
@@ -102,7 +118,6 @@ select:focus {
   cursor: pointer;
 }
 
-/* Botão Adicionar (+) */
 .btn-adicionar {
   background-color: #f39c12;
   color: #121212;
@@ -119,7 +134,7 @@ select:focus {
   background-color: #d68910;
 }
 
-/* Lista de Itens Ul */
+/* Lista de Itens */
 #lista-itens {
   list-style: none;
   max-height: 320px;
@@ -149,7 +164,6 @@ select:focus {
   padding-right: 8px;
 }
 
-/* Botão Remover X */
 .btn-remover {
   background: none;
   border: none;
@@ -165,7 +179,7 @@ select:focus {
   background-color: rgba(231, 76, 60, 0.2);
 }
 
-/* Container de Botões e Ações */
+/* Container de Botões */
 .acoes-container {
   display: flex;
   flex-direction: column;
@@ -175,7 +189,7 @@ select:focus {
 }
 
 .btn-whatsapp,
-.btn-txt {
+.btn-excel {
   width: 100%;
   padding: 12px;
   border: none;
@@ -195,13 +209,13 @@ select:focus {
   color: #ffffff;
 }
 
-.btn-txt {
-  background-color: #007bff;
+.btn-excel {
+  background-color: #107c41;
   color: #ffffff;
 }
 
 .btn-whatsapp:hover,
-.btn-txt:hover {
+.btn-excel:hover {
   opacity: 0.9;
 }
 
@@ -253,7 +267,7 @@ select:focus {
   display: none;
 }
 
-/* Toast de Notificação */
+/* Toast */
 #toast {
   visibility: hidden;
   min-width: 220px;
@@ -286,7 +300,7 @@ select:focus {
   to { bottom: 0; opacity: 0; }
 }
 
-/* Ajustes para telas muito pequenas */
+/* Responsividade Mobile */
 @media (max-width: 480px) {
   .container {
     padding: 16px;
@@ -301,10 +315,7 @@ select:focus {
     flex: auto;
   }
 
-  #qtd-item {
-    flex: 1;
-  }
-
+  #qtd-item,
   #medida-item {
     flex: 1;
   }
