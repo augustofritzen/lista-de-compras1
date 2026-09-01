@@ -53,19 +53,21 @@
     <!-- Cabeçalho da Lista -->
     <div class="list-header">
       <span>ITENS DA LISTA</span>
-      <button type="button" class="btn-limpar" onclick="limparLista()">LIMPAR TUDO</button>
     </div>
 
     <!-- Lista Dinâmica de Itens -->
     <ul id="lista-itens"></ul>
 
-    <!-- Botões de Ação -->
+    <!-- Botões de Ação na Parte Inferior -->
     <div class="action-buttons">
       <button type="button" class="btn-action btn-texto" onclick="enviarWhatsAppTexto()">
         💬 ENVIAR VIA TEXTO
       </button>
       <button type="button" class="btn-action btn-restaurar" onclick="restaurarUltimaLista()">
         🔄 RESTAURAR ÚLTIMA LISTA
+      </button>
+      <button type="button" class="btn-action btn-limpar-tudo" onclick="limparLista()">
+        🗑️ LIMPAR LISTA ATUAL
       </button>
     </div>
   </main>
