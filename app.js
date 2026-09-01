@@ -1,7 +1,7 @@
 let itens = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Carrega lista salva
+  // Carrega lista atual
   const dadosSalvos = localStorage.getItem('minha_lista_compras');
   if (dadosSalvos) {
     itens = JSON.parse(dadosSalvos);
@@ -59,12 +59,40 @@ function removerItem(id) {
 function limparLista() {
   if (itens.length === 0) return;
   
-  if (confirm("Deseja realmente apagar toda a lista?")) {
+  if (confirm("Deseja apagar a lista atual? (Você poderá restaurá-la depois)")) {
+    // Salva o histórico da última lista antes de apagar
+    localStorage.setItem('ultima_lista_compras', JSON.stringify(itens));
     itens = [];
     salvarStorage();
     renderizarLista();
-    exibirToast("Lista limpa!");
+    exibirToast("Lista limpa! Copia salva para restauração.");
   }
+}
+
+function restaurarUltimaLista() {
+  const listaSalva = localStorage.getItem('ultima_lista_compras');
+  
+  if (!listaSalva) {
+    exibirToast("Nenhuma lista salva para restaurar!");
+    return;
+  }
+
+  const itensRestaurados = JSON.parse(listaSalva);
+  if (itensRestaurados.length === 0) {
+    exibirToast("A lista salva está vazia!");
+    return;
+  }
+
+  if (itens.length > 0) {
+    if (!confirm("Isso irá substituir a lista atual. Deseja continuar?")) {
+      return;
+    }
+  }
+
+  itens = itensRestaurados;
+  salvarStorage();
+  renderizarLista();
+  exibirToast("Última lista restaurada com sucesso!");
 }
 
 function renderizarLista() {
@@ -112,6 +140,9 @@ function enviarWhatsAppTexto() {
     const marcaTexto = item.marca ? ` (${item.marca})` : '';
     mensagem += `${index + 1}. *${item.nome}*${marcaTexto} - ${item.qtd} ${item.medida}\n`;
   });
+
+  // Salva uma cópia no histórico ao enviar
+  localStorage.setItem('ultima_lista_compras', JSON.stringify(itens));
 
   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
   window.open(url, '_blank');
