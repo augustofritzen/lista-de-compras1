@@ -195,16 +195,15 @@ async function exportarPlanilhaCSV() {
     csvConteudo += `"${item.nome}";"${item.qtd}";"${item.medida}";"${marca}"\n`;
   });
 
-  // BOM para garantir acentuação correta no Excel em Português
-  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  const blob = new Blob([bom, csvConteudo], { type: 'text/csv;charset=utf-8;' });
-  
   const nomeArquivo = `Lista_${nomeEmpresa.replace(/\s+/g, '_')}_${dataArquivo}.csv`;
 
-  // Tenta o compartilhamento nativo (celular)
+  // 1. Tenta compartilhamento nativo do celular (WhatsApp, Drive, Excel, etc.)
   if (navigator.share && navigator.canShare) {
     try {
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const blob = new Blob([bom, csvConteudo], { type: 'text/csv;charset=utf-8;' });
       const arquivo = new File([blob], nomeArquivo, { type: 'text/csv' });
+
       if (navigator.canShare({ files: [arquivo] })) {
         await navigator.share({
           files: [arquivo],
@@ -214,29 +213,26 @@ async function exportarPlanilhaCSV() {
         return;
       }
     } catch (err) {
-      if (err.name === 'AbortError') return;
+      if (err.name === 'AbortError') return; // Usuário fechou o menu de compartilhamento
     }
   }
 
-  // Fallback direto para download no navegador/PC
-  fazerDownloadPlanilha(blob, nomeArquivo);
+  // 2. Método via Data URI (Evita o pop-up travado "Save As" no Android)
+  fazerDownloadPlanilha(csvConteudo, nomeArquivo);
 }
 
-// Função de download direto da planilha
-function fazerDownloadPlanilha(blob, nomeArquivo) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  a.href = url;
-  a.download = nomeArquivo;
+// Função otimizada para download direto no Android/PC
+function fazerDownloadPlanilha(conteudoCsv, nomeArquivo) {
+  // UTF-8 BOM codificado em Data URI para o Excel ler acentuação corretamente
+  const encodedUri = 'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURIComponent(conteudoCsv);
   
-  document.body.appendChild(a);
-  a.click();
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', nomeArquivo);
   
-  setTimeout(() => {
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, 100);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
   exibirToast('Planilha gerada com sucesso!');
 }
