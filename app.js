@@ -93,7 +93,7 @@ function salvarLista() {
   localStorage.setItem('listaCompras', JSON.stringify(lista));
 }
 
-// Desenha os itens na tela (Mantendo a ordem: ITEM QTD UN MARCA)
+// Desenha os itens na tela
 function renderizarLista() {
   listaUl.innerHTML = '';
 
@@ -104,11 +104,8 @@ function renderizarLista() {
 
   lista.forEach(item => {
     const li = document.createElement('li');
-    
-    // Formatação da marca caso informada
     const marcaTexto = item.marca ? ` ${item.marca}` : '';
 
-    // Formato: ITEM QUANTIDADE UNIDADE MARCA
     li.innerHTML = `
       <span>${item.nome} ${item.qtd} ${item.medida}${marcaTexto}</span>
       <button type="button" class="btn-remover" onclick="removerItem(${item.id})">✕</button>
@@ -155,7 +152,7 @@ function restaurarUltimaLista() {
   exibirToast('Última lista restaurada!');
 }
 
-// Formata e envia a lista formatada via WhatsApp no formato: ITEM QUANTIDADE UNIDADE MARCA
+// Formata a mensagem no WhatsApp em formato de Planilha/Tabela monospaçada
 function enviarWhatsAppTexto() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de enviar!');
@@ -163,13 +160,31 @@ function enviarWhatsAppTexto() {
   }
 
   let texto = "*LISTA DE COMPRAS - CHOPERIA 737*\n\n";
-  lista.forEach((item, index) => {
-    const marcaTexto = item.marca ? ` ${item.marca}` : '';
-    // Exemplo de saída: "1. COCA COLA 2 L COCA-COLA" ou "1. ARROZ 5 KG"
-    texto += `${index + 1}. ${item.nome} ${item.qtd} ${item.medida}${marcaTexto}\n`;
+  texto += "```\n"; // Inicia o bloco monoespaçado do WhatsApp
+
+  // Cabeçalho da Planilha
+  const cItem = "ITEM".padEnd(16, ' ');
+  const cQtd = "QTD".padEnd(6, ' ');
+  const cUn = "UN".padEnd(6, ' ');
+  const cMarca = "MARCA";
+  
+  texto += `${cItem} | ${cQtd} | ${cUn} | ${cMarca}\n`;
+  texto += "-----------------------------------------\n";
+
+  // Linhas dos Itens
+  lista.forEach(item => {
+    const nomeTruncado = item.nome.length > 16 ? item.nome.substring(0, 13) + "..." : item.nome;
+    const itemStr = nomeTruncado.padEnd(16, ' ');
+    const qtdStr = String(item.qtd).padEnd(6, ' ');
+    const unStr = item.medida.padEnd(6, ' ');
+    const marcaStr = item.marca || "-";
+
+    texto += `${itemStr} | ${qtdStr} | ${unStr} | ${marcaStr}\n`;
   });
 
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+  texto += "```"; // Fecha o bloco monoespaçado
+
+  const url = `[https://api.whatsapp.com/send?text=$](https://api.whatsapp.com/send?text=$){encodeURIComponent(texto)}`;
   window.open(url, '_blank');
 }
 
