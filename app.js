@@ -185,6 +185,7 @@ async function exportarPlanilhaCSV() {
   const dataArquivo = agora.toISOString().split('T')[0];
   const nomeEmpresa = nomeEmpresaInput.value.trim().toUpperCase() || 'LISTA DE COMPRAS';
 
+  // Montagem do conteúdo em formato CSV
   let csvConteudo = `LISTA DE COMPRAS - ${nomeEmpresa}\n`;
   csvConteudo += `Data:;${dataFormatada}\n\n`;
   csvConteudo += `Item;Quantidade;Unidade;Marca/Obs\n`;
@@ -194,38 +195,49 @@ async function exportarPlanilhaCSV() {
     csvConteudo += `"${item.nome}";"${item.qtd}";"${item.medida}";"${marca}"\n`;
   });
 
+  // BOM para garantir acentuação correta no Excel em Português
   const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
   const blob = new Blob([bom, csvConteudo], { type: 'text/csv;charset=utf-8;' });
   
   const nomeArquivo = `Lista_${nomeEmpresa.replace(/\s+/g, '_')}_${dataArquivo}.csv`;
-  const arquivo = new File([blob], nomeArquivo, { type: 'text/csv' });
 
-  if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+  // Tenta o compartilhamento nativo (celular)
+  if (navigator.share && navigator.canShare) {
     try {
-      await navigator.share({
-        files: [arquivo],
-        title: `Planilha - ${nomeEmpresa}`,
-        text: `Segue a planilha da lista de compras do dia ${dataFormatada}.`
-      });
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        fazerDownloadPlanilha(blob, nomeArquivo);
+      const arquivo = new File([blob], nomeArquivo, { type: 'text/csv' });
+      if (navigator.canShare({ files: [arquivo] })) {
+        await navigator.share({
+          files: [arquivo],
+          title: `Planilha - ${nomeEmpresa}`,
+          text: `Segue a planilha da lista de compras do dia ${dataFormatada}.`
+        });
+        return;
       }
+    } catch (err) {
+      if (err.name === 'AbortError') return;
     }
-  } else {
-    fazerDownloadPlanilha(blob, nomeArquivo);
   }
+
+  // Fallback direto para download no navegador/PC
+  fazerDownloadPlanilha(blob, nomeArquivo);
 }
 
+// Função de download direto da planilha
 function fazerDownloadPlanilha(blob, nomeArquivo) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
+  a.style.display = 'none';
   a.href = url;
   a.download = nomeArquivo;
+  
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+
   exibirToast('Planilha gerada com sucesso!');
 }
 
