@@ -149,32 +149,79 @@ function obterEmojiItem(nome) {
   return '\u{1F539}'; // 🔹 Emoji padrão
 }
 
-// Formata e envia a lista apenas com a data no WhatsApp
+// Gera o texto formatado para exportação
+function geraringredienteTexto() {
+  const agora = new Date();
+  const dataFormatada = agora.toLocaleDateString('pt-BR');
+
+  let texto = "LISTA DE COMPRAS - CHOPERIA 737\n";
+  texto += `Data: ${dataFormatada}\n`;
+  texto += "-----------------------------------\n\n";
+
+  lista.forEach(item => {
+    const emoji = obterEmojiItem(item.nome);
+    const marcaTexto = item.marca ? ` (${item.marca})` : '';
+    texto += `${emoji} ${item.nome} - ${item.qtd} ${item.medida}${marcaTexto}\n`;
+  });
+
+  return texto;
+}
+
+// Formata e envia a lista no WhatsApp
 function enviarWhatsAppTexto() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de enviar!');
     return;
   }
 
-  // Obtenção apenas da data atual
-  const agora = new Date();
-  const dataFormatada = agora.toLocaleDateString('pt-BR');
-
-  let texto = "*LISTA DE COMPRAS - CHOPERIA 737*\n";
-  texto += `📅 *Data:* ${dataFormatada}\n`;
-  texto += "-----------------------------------\n\n";
-
-  lista.forEach(item => {
-    const emoji = obterEmojiItem(item.nome);
-    const marcaTexto = item.marca ? ` *(${item.marca})*` : '';
-
-    texto += `${emoji} *${item.nome}* - ${item.qtd} ${item.medida}${marcaTexto}\n`;
-  });
-
+  const texto = geraringredienteTexto();
   localStorage.setItem('ultimaListaBackup', JSON.stringify(lista));
 
   const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
   window.location.href = url;
+}
+
+// Exporta a lista como arquivo .txt para o Bloco de Notas ou Compartilhamento do Sistema
+async function exportarBlocoDeNotas() {
+  if (lista.length === 0) {
+    exibirToast('Adicione itens antes de exportar!');
+    return;
+  }
+
+  const conteudo = geraringredienteTexto();
+  const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+  const arquivo = new File([blob], 'lista_de_compras.txt', { type: 'text/plain' });
+
+  // Tenta usar o compartilhamento nativo do celular (para salvar no Keep, Bloco de Notas, etc.)
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+    try {
+      await navigator.share({
+        files: [arquivo],
+        title: 'Lista de Compras',
+        text: 'Segue a lista de compras.'
+      });
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        fazerDownloadTxt(blob);
+      }
+    }
+  } else {
+    // Se for no computador ou navegador antigo, faz o download do arquivo .txt direto
+    fazerDownloadTxt(blob);
+  }
+}
+
+// Função auxiliar para baixar o arquivo .txt diretamente
+function fazerDownloadTxt(blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'lista_de_compras.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  exibirToast('Arquivo .txt gerado com sucesso!');
 }
 
 // Troca dinâmica da imagem de fundo
