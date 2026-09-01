@@ -130,23 +130,23 @@ function restaurarUltimaLista() {
   exibirToast('Última lista restaurada!');
 }
 
-// Retorna um emoji baseado em palavras-chave no nome do item
+// Retorna um emoji seguro para URL baseado em palavras-chave no nome do item
 function obterEmojiItem(nome) {
   const itemUpper = nome.toUpperCase();
 
-  if (itemUpper.includes('BOI') || itemUpper.includes('COXÃO') || itemUpper.includes('ALCATRA') || itemUpper.includes('PICANHA') || itemUpper.includes('CARNE') || itemUpper.includes('COSTELA') || itemUpper.includes('CONTRA')) return '🐂';
-  if (itemUpper.includes('FRANGO') || itemUpper.includes('COXINHA') || itemUpper.includes('PEITO') || itemUpper.includes('ASA') || itemUpper.includes('SASSAMI')) return '🐔';
-  if (itemUpper.includes('PORCO') || itemUpper.includes('LINGUIÇA') || itemUpper.includes('BACON') || itemUpper.includes('BISTECA') || itemUpper.includes('LOMBO') || itemUpper.includes('CALABRESA')) return '🐖';
-  if (itemUpper.includes('PEIXE') || itemUpper.includes('TILAPIA') || itemUpper.includes('TILÁPIA') || itemUpper.includes('CAMARÃO')) return '🐟';
-  if (itemUpper.includes('CERVEJA') || itemUpper.includes('CHOPP') || itemUpper.includes('LATA') || itemUpper.includes('GARRAFA') || itemUpper.includes('HEINEKEN') || itemUpper.includes('AMSTEL') || itemUpper.includes('BRAHMA')) return '🍺';
-  if (itemUpper.includes('COCA') || itemUpper.includes('GUARANÁ') || itemUpper.includes('REFRIGERANTE') || itemUpper.includes('SUCO') || itemUpper.includes('AGUA') || itemUpper.includes('ÁGUA') || itemUpper.includes('TONICA') || itemUpper.includes('TÔNICA')) return '🥤';
-  if (itemUpper.includes('QUEIJO') || itemUpper.includes('MUSSARELA') || itemUpper.includes('PARMESÃO') || itemUpper.includes('PROVOLONE') || itemUpper.includes('CATUPIRY')) return '🧀';
-  if (itemUpper.includes('PÃO') || itemUpper.includes('TORRADA') || itemUpper.includes('BAGUETE')) return '🍞';
-  if (itemUpper.includes('TOMATE') || itemUpper.includes('ALFACE') || itemUpper.includes('CEBOLA') || itemUpper.includes('BATATA') || itemUpper.includes('ALHO') || itemUpper.includes('CHEIRO') || itemUpper.includes('VERDURA')) return '🥬';
-  if (itemUpper.includes('ARROZ') || itemUpper.includes('FEIJÃO') || itemUpper.includes('FARINHA') || itemUpper.includes('OLEO') || itemUpper.includes('ÓLEO') || itemUpper.includes('AZEITE') || itemUpper.includes('SAL')) return '📦';
-  if (itemUpper.includes('DETERGENTE') || itemUpper.includes('SABÃO') || itemUpper.includes('PAPEL') || itemUpper.includes('GUARDANAPO') || itemUpper.includes('LIMPEZA') || itemUpper.includes('ÁLCOOL') || itemUpper.includes('ALCOOL')) return '🧹';
+  if (itemUpper.includes('BOI') || itemUpper.includes('COXÃO') || itemUpper.includes('ALCATRA') || itemUpper.includes('PICANHA') || itemUpper.includes('CARNE') || itemUpper.includes('COSTELA') || itemUpper.includes('CONTRA')) return '\u{1F402}'; // 🐂
+  if (itemUpper.includes('FRANGO') || itemUpper.includes('COXINHA') || itemUpper.includes('PEITO') || itemUpper.includes('ASA') || itemUpper.includes('SASSAMI')) return '\u{1F414}'; // 🐔
+  if (itemUpper.includes('PORCO') || itemUpper.includes('LINGUIÇA') || itemUpper.includes('BACON') || itemUpper.includes('BISTECA') || itemUpper.includes('LOMBO') || itemUpper.includes('CALABRESA')) return '\u{1F416}'; // 🐖
+  if (itemUpper.includes('PEIXE') || itemUpper.includes('TILAPIA') || itemUpper.includes('TILÁPIA') || itemUpper.includes('CAMARÃO')) return '\u{1F41F}'; // 🐟
+  if (itemUpper.includes('CERVEJA') || itemUpper.includes('CHOPP') || itemUpper.includes('LATA') || itemUpper.includes('GARRAFA') || itemUpper.includes('HEINEKEN') || itemUpper.includes('AMSTEL') || itemUpper.includes('BRAHMA')) return '\u{1F37A}'; // 🍺
+  if (itemUpper.includes('COCA') || itemUpper.includes('GUARANÁ') || itemUpper.includes('REFRIGERANTE') || itemUpper.includes('SUCO') || itemUpper.includes('AGUA') || itemUpper.includes('ÁGUA') || itemUpper.includes('TONICA') || itemUpper.includes('TÔNICA')) return '\u{1F964}'; // 🥤
+  if (itemUpper.includes('QUEIJO') || itemUpper.includes('MUSSARELA') || itemUpper.includes('PARMESÃO') || itemUpper.includes('PROVOLONE') || itemUpper.includes('CATUPIRY')) return '\u{1F9C0}'; // 🧀
+  if (itemUpper.includes('PÃO') || itemUpper.includes('TORRADA') || itemUpper.includes('BAGUETE')) return '\u{1F35E}'; // 🍞
+  if (itemUpper.includes('TOMATE') || itemUpper.includes('ALFACE') || itemUpper.includes('CEBOLA') || itemUpper.includes('BATATA') || itemUpper.includes('ALHO') || itemUpper.includes('CHEIRO') || itemUpper.includes('VERDURA')) return '\u{1F96C}'; // 🥬
+  if (itemUpper.includes('ARROZ') || itemUpper.includes('FEIJÃO') || itemUpper.includes('FARINHA') || itemUpper.includes('OLEO') || itemUpper.includes('ÓLEO') || itemUpper.includes('AZEITE') || itemUpper.includes('SAL')) return '\u{1F4E6}'; // 📦
+  if (itemUpper.includes('DETERGENTE') || itemUpper.includes('SABÃO') || itemUpper.includes('PAPEL') || itemUpper.includes('GUARDANAPO') || itemUpper.includes('LIMPEZA') || itemUpper.includes('ÁLCOOL') || itemUpper.includes('ALCOOL')) return '\u{1F9F9}'; // 🧹
 
-  return '🔹'; // Emoji padrão caso não encontre nenhuma palavra correspondente
+  return '\u{1F539}'; // 🔹 Emoji padrão
 }
 
 // Formata e envia a lista com emojis inteligentes no WhatsApp
@@ -163,7 +163,6 @@ function enviarWhatsAppTexto() {
     const emoji = obterEmojiItem(item.nome);
     const marcaTexto = item.marca ? ` *(${item.marca})*` : '';
 
-    // Exemplo: 🐂 COXÃO MOLE - 1 PEÇA (FREEBOI)
     texto += `${emoji} *${item.nome}* - ${item.qtd} ${item.medida}${marcaTexto}\n`;
   });
 
