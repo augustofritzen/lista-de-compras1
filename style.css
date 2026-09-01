@@ -12,17 +12,18 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  padding-bottom: 20px;
 }
 
 /* Barra Superior */
 .top-bar {
   width: 100%;
-  max-width: 480px;
+  max-width: 600px; /* Expandido para dar mais espaço */
   background-color: #1a1a1a;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
+  padding: 14px 20px;
   border-bottom: 1px solid #333;
 }
 
@@ -30,12 +31,13 @@ body {
   color: #888;
   font-size: 1.1rem;
   font-weight: 500;
+  text-transform: lowercase;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .btn-change-bg {
@@ -43,12 +45,12 @@ body {
   color: #fff;
   border: 1px solid #555;
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -62,59 +64,60 @@ body {
   color: #ccc;
   border: 1px solid #555;
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: bold;
 }
 
-/* Container com Imagem de Fundo Ajustada */
+/* Container Principal Expandido */
 .container {
-  width: 92%;
-  max-width: 440px;
+  width: 95%;
+  max-width: 600px; /* Largura maior do aplicativo */
   margin: 15px auto;
-  padding: 20px;
-  border-radius: 18px;
+  padding: 24px;
+  border-radius: 20px;
   
   background-image: url('fundo.jpg');
   background-repeat: no-repeat;
   background-position: center;
-  background-size: contain;
+  background-size: cover;
   
-  background-color: rgba(230, 230, 230, 0.88);
+  background-color: rgba(230, 230, 230, 0.90);
   background-blend-mode: overlay;
 
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .main-title {
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #111;
   margin-bottom: 5px;
+  letter-spacing: 0.5px;
 }
 
-/* Formulário */
+/* Formulário de Entrada */
 .form-group {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 input[type="text"],
 input[type="number"],
 select {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid #aaa;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.95);
   color: #222;
   font-weight: bold;
   text-transform: uppercase;
@@ -128,7 +131,7 @@ input::placeholder {
 
 .form-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .form-row input[type="number"] {
@@ -144,10 +147,15 @@ input::placeholder {
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 1.5rem;
+  border-radius: 12px;
+  font-size: 1.6rem;
   font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-adicionar:active {
+  background-color: #218838;
 }
 
 /* Cabeçalho de Itens */
@@ -155,45 +163,51 @@ input::placeholder {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 5px;
   font-weight: bold;
-  color: #333;
-  font-size: 0.85rem;
+  color: #222;
+  font-size: 0.9rem;
 }
 
 .btn-limpar {
   background-color: #bd2130;
   color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-/* Lista de Itens */
+.btn-limpar:active {
+  background-color: #a71d2a;
+}
+
+/* Lista Dinâmica com Maior Altura */
 #lista-itens {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 260px;
+  gap: 10px;
+  max-height: 380px; /* Aumentado para exibir mais itens sem rolar */
   overflow-y: auto;
   padding-right: 4px;
 }
 
 #lista-itens li {
-  background-color: rgba(255, 255, 255, 0.95);
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px 14px;
+  background-color: rgba(255, 255, 255, 0.98);
+  border: 1px solid #bbb;
+  border-radius: 12px;
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  font-size: 0.9rem;
-  color: #222;
+  font-size: 0.95rem;
+  color: #111;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .btn-remover {
@@ -201,32 +215,43 @@ input::placeholder {
   color: white;
   border: none;
   border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  font-size: 0.8rem;
+  width: 28px;
+  height: 28px;
+  font-size: 0.85rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.btn-remover:active {
+  background-color: #c82333;
 }
 
 /* Botões de Ação */
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-top: 10px;
 }
 
 .btn-action {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: bold;
   cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s;
+}
+
+.btn-action:active {
+  opacity: 0.9;
 }
 
 .btn-texto {
@@ -240,17 +265,18 @@ input::placeholder {
 /* Notificação Toast */
 .toast {
   visibility: hidden;
-  min-width: 220px;
-  background-color: #333;
+  min-width: 250px;
+  background-color: #222;
   color: #fff;
   text-align: center;
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 10px;
+  padding: 14px;
   position: fixed;
   z-index: 1000;
   bottom: 30px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   opacity: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   transition: opacity 0.3s, visibility 0.3s;
 }
 
