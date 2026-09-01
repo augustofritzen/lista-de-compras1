@@ -152,7 +152,7 @@ function restaurarUltimaLista() {
   exibirToast('Última lista restaurada!');
 }
 
-// Formata a mensagem no WhatsApp em formato de Planilha/Tabela monospaçada
+// Formata e envia a lista formatada no WhatsApp em estilo tabela/planilha
 function enviarWhatsAppTexto() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de enviar!');
@@ -182,39 +182,4 @@ function enviarWhatsAppTexto() {
     texto += `${itemStr} | ${qtdStr} | ${unStr} | ${marcaStr}\n`;
   });
 
-  texto += "```"; // Fecha o bloco monoespaçado
-
-  const url = `[https://api.whatsapp.com/send?text=$](https://api.whatsapp.com/send?text=$){encodeURIComponent(texto)}`;
-  window.open(url, '_blank');
-}
-
-// Troca dinâmica da imagem de fundo
-function alterarFundo(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const container = document.querySelector('.container');
-      container.style.backgroundImage = `url('${e.target.result}')`;
-      localStorage.setItem('imagemFundoCustom', e.target.result);
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-// Restaura a imagem de fundo salva no carregamento
-const fundoSalvo = localStorage.getItem('imagemFundoCustom');
-if (fundoSalvo) {
-  document.querySelector('.container').style.backgroundImage = `url('${fundoSalvo}')`;
-}
-
-// Exibe notificações rápidas estilo Toast na parte inferior
-function exibirToast(mensagem) {
-  const toast = document.getElementById('toast');
-  toast.innerText = mensagem;
-  toast.classList.add('show');
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 2500);
-}
+  texto += "
