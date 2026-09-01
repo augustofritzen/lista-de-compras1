@@ -1,187 +1,203 @@
-let itens = [];
+// Recupera a lista atual do localStorage ou inicia vazia
+let lista = JSON.parse(localStorage.getItem('listaCompras')) || [];
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Carrega lista atual
-  const dadosSalvos = localStorage.getItem('minha_lista_compras');
-  if (dadosSalvos) {
-    itens = JSON.parse(dadosSalvos);
-    renderizarLista();
-  }
+// Recupera a última unidade utilizada (padrão: 'UN')
+let ultimaUnidade = localStorage.getItem('ultimaUnidade') || 'UN';
 
-  // Carrega fundo personalizado
-  const fundoSalvo = localStorage.getItem('fundo_personalizado');
-  if (fundoSalvo) {
-    aplicarImagemFundo(fundoSalvo);
-  }
+// Elementos do DOM
+const nomeInput = document.getElementById('nome-item');
+const marcaInput = document.getElementById('marca-item');
+const qtdInput = document.getElementById('qtd-item');
+const medidaSelect = document.getElementById('medida-item');
+const listaUl = document.getElementById('lista-itens');
+
+// Carrega os dados salvos na inicialização
+window.addEventListener('DOMContentLoaded', () => {
+  medidaSelect.value = ultimaUnidade;
+  renderizarLista();
 });
 
-function salvarStorage() {
-  localStorage.setItem('minha_lista_compras', JSON.stringify(itens));
+// Atualiza a última unidade no localStorage sempre que o usuário alterar o select
+medidaSelect.addEventListener('change', () => {
+  ultimaUnidade = medidaSelect.value;
+  localStorage.setItem('ultimaUnidade', ultimaUnidade);
+});
+
+// Tenta adicionar o item automaticamente quando os campos são alterados
+function verificarEAdicionarAuto() {
+  const nome = nomeInput.value.trim();
+  const qtd = parseFloat(qtdInput.value);
+
+  // Se os campos obrigatórios estiverem válidos, adiciona automaticamente
+  if (nome !== '' && !isNaN(qtd) && qtd > 0) {
+    executarAdicaoItem();
+  }
 }
 
+// Ouvintes nos campos para acionar a adição automática
+nomeInput.addEventListener('input', verificarEAdicionarAuto);
+qtdInput.addEventListener('input', verificarEAdicionarAuto);
+
+// Submissão manual pelo formulário (caso aperte Enter ou clique no +)
 function adicionarItem(event) {
-  event.preventDefault();
-
-  const inputNome = document.getElementById('nome-item');
-  const inputMarca = document.getElementById('marca-item');
-  const inputQtd = document.getElementById('qtd-item');
-  const selectMedida = document.getElementById('medida-item');
-
-  const nome = inputNome.value.trim().toUpperCase();
-  const marca = inputMarca.value.trim().toUpperCase();
-  const qtd = parseFloat(inputQtd.value);
-  const medida = selectMedida.value;
+  if (event) event.preventDefault();
+  
+  const nome = nomeInput.value.trim();
+  const qtd = parseFloat(qtdInput.value);
 
   if (!nome || isNaN(qtd) || qtd <= 0) {
-    exibirToast("Preencha a descrição e uma quantidade válida!");
+    exibirToast('Preencha a descrição e a quantidade!');
     return;
   }
 
-  itens.push({ id: Date.now(), nome, marca, qtd, medida });
-  salvarStorage();
-  renderizarLista();
-
-  inputNome.value = '';
-  inputMarca.value = '';
-  inputQtd.value = '';
-  inputNome.focus();
-
-  exibirToast("Item adicionado!");
+  executarAdicaoItem();
 }
 
-function removerItem(id) {
-  itens = itens.filter(item => item.id !== id);
-  salvarStorage();
-  renderizarLista();
-  exibirToast("Item removido!");
-}
+// Lógica de inserção do item e limpeza dos campos
+function executarAdicaoItem() {
+  const nome = nomeInput.value.trim().toUpperCase();
+  const marca = marcaInput.value.trim().toUpperCase();
+  const qtd = parseFloat(qtdInput.value);
+  const medida = medidaSelect.value;
 
-function limparLista() {
-  if (itens.length === 0) return;
+  // Salva a unidade escolhida como preferência
+  ultimaUnidade = medida;
+  localStorage.setItem('ultimaUnidade', ultimaUnidade);
+
+  // Adiciona o novo item ao topo da lista
+  lista.unshift({
+    id: Date.now(),
+    nome,
+    marca,
+    qtd,
+    medida
+  });
+
+  salvarLista();
+  renderizarLista();
+
+  // Limpa apenas o nome, marca e quantidade para nova digitação
+  nomeInput.value = '';
+  marcaInput.value = '';
+  qtdInput.value = '';
   
-  if (confirm("Deseja apagar a lista atual? (Você poderá restaurá-la depois)")) {
-    // Salva o histórico da última lista antes de apagar
-    localStorage.setItem('ultima_lista_compras', JSON.stringify(itens));
-    itens = [];
-    salvarStorage();
-    renderizarLista();
-    exibirToast("Lista limpa! Copia salva para restauração.");
-  }
+  // Mantém a última unidade selecionada
+  medidaSelect.value = ultimaUnidade;
+
+  // Retorna o foco para o campo de descrição
+  nomeInput.focus();
 }
 
-function restaurarUltimaLista() {
-  const listaSalva = localStorage.getItem('ultima_lista_compras');
-  
-  if (!listaSalva) {
-    exibirToast("Nenhuma lista salva para restaurar!");
-    return;
-  }
-
-  const itensRestaurados = JSON.parse(listaSalva);
-  if (itensRestaurados.length === 0) {
-    exibirToast("A lista salva está vazia!");
-    return;
-  }
-
-  if (itens.length > 0) {
-    if (!confirm("Isso irá substituir a lista atual. Deseja continuar?")) {
-      return;
-    }
-  }
-
-  itens = itensRestaurados;
-  salvarStorage();
-  renderizarLista();
-  exibirToast("Última lista restaurada com sucesso!");
+// Salva a lista no localStorage
+function salvarLista() {
+  localStorage.setItem('listaCompras', JSON.stringify(lista));
 }
 
+// Desenha os itens na tela
 function renderizarLista() {
-  const ul = document.getElementById('lista-itens');
-  ul.innerHTML = '';
+  listaUl.innerHTML = '';
 
-  if (itens.length === 0) {
-    ul.innerHTML = '<li style="justify-content: center; color: #888;">SUA LISTA ESTÁ VAZIA</li>';
+  if (lista.length === 0) {
+    listaUl.innerHTML = '<li style="justify-content: center; color: #777;">Sua lista está vazia.</li>';
     return;
   }
 
-  itens.forEach(item => {
+  lista.forEach(item => {
     const li = document.createElement('li');
-
-    const span = document.createElement('span');
-    span.className = 'item-info';
     
-    const textoMarca = item.marca ? ` (${item.marca})` : '';
-    span.textContent = `${item.nome}${textoMarca} - ${item.qtd} ${item.medida}`;
+    // Formatação da exibição da marca caso informada
+    const marcaTexto = item.marca ? ` (${item.marca})` : '';
 
-    const btnRemover = document.createElement('button');
-    btnRemover.className = 'btn-remover';
-    btnRemover.textContent = '✕';
-    btnRemover.onclick = () => removerItem(item.id);
-
-    li.appendChild(span);
-    li.appendChild(btnRemover);
-    ul.appendChild(li);
+    li.innerHTML = `
+      <span>${item.qtd} ${item.medida} - ${item.nome}${marcaTexto}</span>
+      <button type="button" class="btn-remover" onclick="removerItem(${item.id})">✕</button>
+    `;
+    
+    listaUl.appendChild(li);
   });
 }
 
-// Envia a lista como texto formatado diretamente para o WhatsApp com data e hora
-function enviarWhatsAppTexto() {
-  if (itens.length === 0) {
-    exibirToast("Adicione itens à lista primeiro!");
+// Remove um item individual da lista
+function removerItem(id) {
+  lista = lista.filter(item => item.id !== id);
+  salvarLista();
+  renderizarLista();
+}
+
+// Limpa toda a lista atual e salva backup para restauração
+function limparLista() {
+  if (lista.length === 0) {
+    exibirToast('A lista já está vazia!');
     return;
   }
 
-  const agora = new Date();
-  const dataFormatada = agora.toLocaleDateString('pt-BR');
-  const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  // Grava o backup da lista antes de apagar
+  localStorage.setItem('ultimaListaBackup', JSON.stringify(lista));
+  lista = [];
+  salvarLista();
+  renderizarLista();
+  exibirToast('Lista limpa com sucesso!');
+}
 
-  let mensagem = `*LISTA DE COMPRAS*\n📅 _Gerada em: ${dataFormatada} às ${horaFormatada}_\n\n`;
-  itens.forEach((item, index) => {
+// Restaura a última lista que foi salva antes da limpeza
+function restaurarUltimaLista() {
+  const backup = localStorage.getItem('ultimaListaBackup');
+  
+  if (!backup) {
+    exibirToast('Nenhuma lista para restaurar!');
+    return;
+  }
+
+  lista = JSON.parse(backup);
+  salvarLista();
+  renderizarLista();
+  exibirToast('Última lista restaurada!');
+}
+
+// Formata e envia a lista formatada via WhatsApp
+function enviarWhatsAppTexto() {
+  if (lista.length === 0) {
+    exibirToast('Adicione itens antes de enviar!');
+    return;
+  }
+
+  let texto = "*LISTA DE COMPRAS - CHOPERIA 737*\n\n";
+  lista.forEach((item, index) => {
     const marcaTexto = item.marca ? ` (${item.marca})` : '';
-    mensagem += `${index + 1}. *${item.nome}*${marcaTexto} - ${item.qtd} ${item.medida}\n`;
+    texto += `${index + 1}. ${item.qtd} ${item.medida} - ${item.nome}${marcaTexto}\n`;
   });
 
-  // Salva uma cópia no histórico ao enviar
-  localStorage.setItem('ultima_lista_compras', JSON.stringify(itens));
-
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
   window.open(url, '_blank');
 }
 
-// Processa a imagem escolhida na galeria do celular
+// Troca dinâmica da imagem de fundo
 function alterarFundo(event) {
   const file = event.target.files[0];
-  if (!file) return;
-
-  if (file.size > 3 * 1024 * 1024) {
-    exibirToast("Escolha uma imagem menor que 3MB!");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const imagemBase64 = e.target.result;
-    localStorage.setItem('fundo_personalizado', imagemBase64);
-    aplicarImagemFundo(imagemBase64);
-    exibirToast("Fundo alterado com sucesso!");
-  };
-
-  reader.readAsDataURL(file);
-}
-
-// Aplica o background no container
-function aplicarImagemFundo(urlImagem) {
-  const container = document.querySelector('.container');
-  if (container) {
-    container.style.backgroundImage = `url('${urlImagem}')`;
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const container = document.querySelector('.container');
+      container.style.backgroundImage = `url('${e.target.result}')`;
+      localStorage.setItem('imagemFundoCustom', e.target.result);
+    };
+    reader.readAsDataURL(file);
   }
 }
 
+// Restaura a imagem de fundo salva no carregamento
+const fundoSalvo = localStorage.getItem('imagemFundoCustom');
+if (fundoSalvo) {
+  document.querySelector('.container').style.backgroundImage = `url('${fundoSalvo}')`;
+}
+
+// Exibe notificações rápidas estilo Toast na parte inferior
 function exibirToast(mensagem) {
   const toast = document.getElementById('toast');
-  toast.textContent = mensagem;
+  toast.innerText = mensagem;
   toast.classList.add('show');
+  
   setTimeout(() => {
     toast.classList.remove('show');
-  }, 3000);
+  }, 2500);
 }
