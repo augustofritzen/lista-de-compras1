@@ -93,7 +93,7 @@ function salvarLista() {
   localStorage.setItem('listaCompras', JSON.stringify(lista));
 }
 
-// Desenha os itens na tela
+// Desenha os itens na tela (Mantendo a ordem: ITEM QTD UN MARCA)
 function renderizarLista() {
   listaUl.innerHTML = '';
 
@@ -105,11 +105,12 @@ function renderizarLista() {
   lista.forEach(item => {
     const li = document.createElement('li');
     
-    // Formatação da exibição da marca caso informada
-    const marcaTexto = item.marca ? ` (${item.marca})` : '';
+    // Formatação da marca caso informada
+    const marcaTexto = item.marca ? ` ${item.marca}` : '';
 
+    // Formato: ITEM QUANTIDADE UNIDADE MARCA
     li.innerHTML = `
-      <span>${item.qtd} ${item.medida} - ${item.nome}${marcaTexto}</span>
+      <span>${item.nome} ${item.qtd} ${item.medida}${marcaTexto}</span>
       <button type="button" class="btn-remover" onclick="removerItem(${item.id})">✕</button>
     `;
     
@@ -154,7 +155,7 @@ function restaurarUltimaLista() {
   exibirToast('Última lista restaurada!');
 }
 
-// Formata e envia a lista formatada via WhatsApp
+// Formata e envia a lista formatada via WhatsApp no formato: ITEM QUANTIDADE UNIDADE MARCA
 function enviarWhatsAppTexto() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de enviar!');
@@ -163,8 +164,9 @@ function enviarWhatsAppTexto() {
 
   let texto = "*LISTA DE COMPRAS - CHOPERIA 737*\n\n";
   lista.forEach((item, index) => {
-    const marcaTexto = item.marca ? ` (${item.marca})` : '';
-    texto += `${index + 1}. ${item.qtd} ${item.medida} - ${item.nome}${marcaTexto}\n`;
+    const marcaTexto = item.marca ? ` ${item.marca}` : '';
+    // Exemplo de saída: "1. COCA COLA 2 L COCA-COLA" ou "1. ARROZ 5 KG"
+    texto += `${index + 1}. ${item.nome} ${item.qtd} ${item.medida}${marcaTexto}\n`;
   });
 
   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
