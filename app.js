@@ -82,10 +82,10 @@ function renderizarLista() {
 
   lista.forEach(item => {
     const li = document.createElement('li');
-    const marcaTexto = item.marca ? ` ${item.marca}` : '';
+    const marcaTexto = item.marca ? ` (${item.marca})` : '';
 
     li.innerHTML = `
-      <span>${item.nome} ${item.qtd} ${item.medida}${marcaTexto}</span>
+      <span><b>${item.nome}</b> - ${item.qtd} ${item.medida}${marcaTexto}</span>
       <button type="button" class="btn-remover" onclick="removerItem(${item.id})">✕</button>
     `;
 
@@ -130,42 +130,45 @@ function restaurarUltimaLista() {
   exibirToast('Última lista restaurada!');
 }
 
-// Formata e envia a lista formatada no WhatsApp em estilo tabela/planilha
+// Retorna um emoji baseado em palavras-chave no nome do item
+function obterEmojiItem(nome) {
+  const itemUpper = nome.toUpperCase();
+
+  if (itemUpper.includes('BOI') || itemUpper.includes('COXÃO') || itemUpper.includes('ALCATRA') || itemUpper.includes('PICANHA') || itemUpper.includes('CARNE') || itemUpper.includes('COSTELA') || itemUpper.includes('CONTRA')) return '🐂';
+  if (itemUpper.includes('FRANGO') || itemUpper.includes('COXINHA') || itemUpper.includes('PEITO') || itemUpper.includes('ASA') || itemUpper.includes('SASSAMI')) return '🐔';
+  if (itemUpper.includes('PORCO') || itemUpper.includes('LINGUIÇA') || itemUpper.includes('BACON') || itemUpper.includes('BISTECA') || itemUpper.includes('LOMBO') || itemUpper.includes('CALABRESA')) return '🐖';
+  if (itemUpper.includes('PEIXE') || itemUpper.includes('TILAPIA') || itemUpper.includes('TILÁPIA') || itemUpper.includes('CAMARÃO')) return '🐟';
+  if (itemUpper.includes('CERVEJA') || itemUpper.includes('CHOPP') || itemUpper.includes('LATA') || itemUpper.includes('GARRAFA') || itemUpper.includes('HEINEKEN') || itemUpper.includes('AMSTEL') || itemUpper.includes('BRAHMA')) return '🍺';
+  if (itemUpper.includes('COCA') || itemUpper.includes('GUARANÁ') || itemUpper.includes('REFRIGERANTE') || itemUpper.includes('SUCO') || itemUpper.includes('AGUA') || itemUpper.includes('ÁGUA') || itemUpper.includes('TONICA') || itemUpper.includes('TÔNICA')) return '🥤';
+  if (itemUpper.includes('QUEIJO') || itemUpper.includes('MUSSARELA') || itemUpper.includes('PARMESÃO') || itemUpper.includes('PROVOLONE') || itemUpper.includes('CATUPIRY')) return '🧀';
+  if (itemUpper.includes('PÃO') || itemUpper.includes('TORRADA') || itemUpper.includes('BAGUETE')) return '🍞';
+  if (itemUpper.includes('TOMATE') || itemUpper.includes('ALFACE') || itemUpper.includes('CEBOLA') || itemUpper.includes('BATATA') || itemUpper.includes('ALHO') || itemUpper.includes('CHEIRO') || itemUpper.includes('VERDURA')) return '🥬';
+  if (itemUpper.includes('ARROZ') || itemUpper.includes('FEIJÃO') || itemUpper.includes('FARINHA') || itemUpper.includes('OLEO') || itemUpper.includes('ÓLEO') || itemUpper.includes('AZEITE') || itemUpper.includes('SAL')) return '📦';
+  if (itemUpper.includes('DETERGENTE') || itemUpper.includes('SABÃO') || itemUpper.includes('PAPEL') || itemUpper.includes('GUARDANAPO') || itemUpper.includes('LIMPEZA') || itemUpper.includes('ÁLCOOL') || itemUpper.includes('ALCOOL')) return '🧹';
+
+  return '🔹'; // Emoji padrão caso não encontre nenhuma palavra correspondente
+}
+
+// Formata e envia a lista com emojis inteligentes no WhatsApp
 function enviarWhatsAppTexto() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de enviar!');
     return;
   }
 
-  let texto = "*LISTA DE COMPRAS - CHOPERIA 737*\n\n";
-  texto += "```\n"; // Inicia o bloco monoespaçado do WhatsApp
+  let texto = "*LISTA DE COMPRAS - CHOPERIA 737*\n";
+  texto += "-----------------------------------\n\n";
 
-  // Cabeçalho da Planilha
-  const cItem = "ITEM".padEnd(16, ' ');
-  const cQtd = "QTD".padEnd(6, ' ');
-  const cUn = "UN".padEnd(6, ' ');
-  const cMarca = "MARCA";
-
-  texto += `${cItem} | ${cQtd} | ${cUn} | ${cMarca}\n`;
-  texto += "-----------------------------------------\n";
-
-  // Linhas dos Itens
   lista.forEach(item => {
-    const nomeTruncado = item.nome.length > 16 ? item.nome.substring(0, 13) + "..." : item.nome;
-    const itemStr = nomeTruncado.padEnd(16, ' ');
-    const qtdStr = String(item.qtd).padEnd(6, ' ');
-    const unStr = item.medida.padEnd(6, ' ');
-    const marcaStr = item.marca || "-";
+    const emoji = obterEmojiItem(item.nome);
+    const marcaTexto = item.marca ? ` *(${item.marca})*` : '';
 
-    texto += `${itemStr} | ${qtdStr} | ${unStr} | ${marcaStr}\n`;
+    // Exemplo: 🐂 COXÃO MOLE - 1 PEÇA (FREEBOI)
+    texto += `${emoji} *${item.nome}* - ${item.qtd} ${item.medida}${marcaTexto}\n`;
   });
 
-  texto += "```"; // Fecha o bloco monoespaçado
-
-  // Salva backup automático antes do envio
   localStorage.setItem('ultimaListaBackup', JSON.stringify(lista));
 
-  // Redireciona diretamente via link universal para abrir o WhatsApp
   const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
   window.location.href = url;
 }
@@ -177,7 +180,9 @@ function alterarFundo(event) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const container = document.querySelector('.container');
-      container.style.backgroundImage = `url('${e.target.result}')`;
+      if (container) {
+        container.style.backgroundImage = `url('${e.target.result}')`;
+      }
       localStorage.setItem('imagemFundoCustom', e.target.result);
     };
     reader.readAsDataURL(file);
