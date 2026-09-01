@@ -1,8 +1,8 @@
 // Recupera a lista atual do localStorage ou inicia vazia
 let lista = JSON.parse(localStorage.getItem('listaCompras')) || [];
 
-// Recupera a última unidade utilizada (padrão: 'UN')
-let ultimaUnidade = localStorage.getItem('ultimaUnidade') || 'UN';
+// Histórico de unidades usadas para cada item (ex: { "COXÃO MOLE": "KG", "COCA COLA": "CX" })
+let historicoUnidades = JSON.parse(localStorage.getItem('historicoUnidades')) || {};
 
 // Elementos do DOM
 const nomeEmpresaInput = document.getElementById('nome-empresa');
@@ -14,8 +14,6 @@ const listaUl = document.getElementById('lista-itens');
 
 // Carrega os dados salvos na inicialização
 window.addEventListener('DOMContentLoaded', () => {
-  medidaSelect.value = ultimaUnidade;
-
   const empresaSalva = localStorage.getItem('nomeEmpresa');
   if (empresaSalva) {
     nomeEmpresaInput.value = empresaSalva;
@@ -24,15 +22,17 @@ window.addEventListener('DOMContentLoaded', () => {
   renderizarLista();
 });
 
+// Ao digitar o nome do item, verifica se já existe uma unidade cadastrada para ele
+nomeInput.addEventListener('input', () => {
+  const nomeDigitado = nomeInput.value.trim().toUpperCase();
+  if (historicoUnidades[nomeDigitado]) {
+    medidaSelect.value = historicoUnidades[nomeDigitado];
+  }
+});
+
 // Salva o nome da empresa quando for editado
 nomeEmpresaInput.addEventListener('input', () => {
   localStorage.setItem('nomeEmpresa', nomeEmpresaInput.value);
-});
-
-// Atualiza a última unidade no localStorage
-medidaSelect.addEventListener('change', () => {
-  ultimaUnidade = medidaSelect.value;
-  localStorage.setItem('ultimaUnidade', ultimaUnidade);
 });
 
 // Adiciona um novo item à lista
@@ -49,8 +49,9 @@ function adicionarItem(event) {
     return;
   }
 
-  ultimaUnidade = medida;
-  localStorage.setItem('ultimaUnidade', ultimaUnidade);
+  // Salva a unidade utilizada especificamente para este item no histórico
+  historicoUnidades[nome] = medida;
+  localStorage.setItem('historicoUnidades', JSON.stringify(historicoUnidades));
 
   lista.unshift({
     id: Date.now(),
@@ -66,7 +67,6 @@ function adicionarItem(event) {
   nomeInput.value = '';
   marcaInput.value = '';
   qtdInput.value = '';
-  medidaSelect.value = ultimaUnidade;
   nomeInput.focus();
 }
 
@@ -223,7 +223,6 @@ async function exportarPlanilhaCSV() {
 
 // Função otimizada para download direto no Android/PC
 function fazerDownloadPlanilha(conteudoCsv, nomeArquivo) {
-  // UTF-8 BOM codificado em Data URI para o Excel ler acentuação corretamente
   const encodedUri = 'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURIComponent(conteudoCsv);
   
   const link = document.createElement('a');
