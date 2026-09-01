@@ -5,6 +5,7 @@ let lista = JSON.parse(localStorage.getItem('listaCompras')) || [];
 let ultimaUnidade = localStorage.getItem('ultimaUnidade') || 'UN';
 
 // Elementos do DOM
+const nomeEmpresaInput = document.getElementById('nome-empresa');
 const nomeInput = document.getElementById('nome-item');
 const marcaInput = document.getElementById('marca-item');
 const qtdInput = document.getElementById('qtd-item');
@@ -14,16 +15,27 @@ const listaUl = document.getElementById('lista-itens');
 // Carrega os dados salvos na inicialização
 window.addEventListener('DOMContentLoaded', () => {
   medidaSelect.value = ultimaUnidade;
+
+  const empresaSalva = localStorage.getItem('nomeEmpresa');
+  if (empresaSalva) {
+    nomeEmpresaInput.value = empresaSalva;
+  }
+
   renderizarLista();
 });
 
-// Atualiza a última unidade no localStorage sempre que o usuário alterar o select
+// Salva o nome da empresa quando for editado
+nomeEmpresaInput.addEventListener('input', () => {
+  localStorage.setItem('nomeEmpresa', nomeEmpresaInput.value);
+});
+
+// Atualiza a última unidade no localStorage
 medidaSelect.addEventListener('change', () => {
   ultimaUnidade = medidaSelect.value;
   localStorage.setItem('ultimaUnidade', ultimaUnidade);
 });
 
-// Adiciona um novo item à lista ao clicar no botão '+' ou apertar Enter
+// Adiciona um novo item à lista
 function adicionarItem(event) {
   if (event) event.preventDefault();
 
@@ -32,17 +44,14 @@ function adicionarItem(event) {
   const qtd = parseFloat(qtdInput.value);
   const medida = medidaSelect.value;
 
-  // Validação dos campos obrigatórios
   if (!nome || isNaN(qtd) || qtd <= 0) {
     exibirToast('Preencha a descrição e uma quantidade válida!');
     return;
   }
 
-  // Salva a unidade escolhida como preferência
   ultimaUnidade = medida;
   localStorage.setItem('ultimaUnidade', ultimaUnidade);
 
-  // Adiciona o novo item no início da lista
   lista.unshift({
     id: Date.now(),
     nome,
@@ -54,24 +63,17 @@ function adicionarItem(event) {
   salvarLista();
   renderizarLista();
 
-  // Limpa os campos para o próximo item
   nomeInput.value = '';
   marcaInput.value = '';
   qtdInput.value = '';
-
-  // Restaura a última unidade selecionada
   medidaSelect.value = ultimaUnidade;
-
-  // Devolve o foco para o campo de descrição
   nomeInput.focus();
 }
 
-// Salva a lista no localStorage
 function salvarLista() {
   localStorage.setItem('listaCompras', JSON.stringify(lista));
 }
 
-// Desenha os itens na tela
 function renderizarLista() {
   listaUl.innerHTML = '';
 
@@ -93,21 +95,18 @@ function renderizarLista() {
   });
 }
 
-// Remove um item individual da lista
 function removerItem(id) {
   lista = lista.filter(item => item.id !== id);
   salvarLista();
   renderizarLista();
 }
 
-// Limpa toda a lista atual e salva backup para restauração
 function limparLista() {
   if (lista.length === 0) {
     exibirToast('A lista já está vazia!');
     return;
   }
 
-  // Grava o backup da lista antes de apagar
   localStorage.setItem('ultimaListaBackup', JSON.stringify(lista));
   lista = [];
   salvarLista();
@@ -115,7 +114,6 @@ function limparLista() {
   exibirToast('Lista limpa com sucesso!');
 }
 
-// Restaura a última lista que foi salva antes da limpeza
 function restaurarUltimaLista() {
   const backup = localStorage.getItem('ultimaListaBackup');
 
@@ -130,101 +128,107 @@ function restaurarUltimaLista() {
   exibirToast('Última lista restaurada!');
 }
 
-// Retorna um emoji seguro para URL baseado em palavras-chave no nome do item
 function obterEmojiItem(nome) {
   const itemUpper = nome.toUpperCase();
 
-  if (itemUpper.includes('BOI') || itemUpper.includes('COXÃO') || itemUpper.includes('ALCATRA') || itemUpper.includes('PICANHA') || itemUpper.includes('CARNE') || itemUpper.includes('COSTELA') || itemUpper.includes('CONTRA')) return '\u{1F402}'; // 🐂
-  if (itemUpper.includes('FRANGO') || itemUpper.includes('COXINHA') || itemUpper.includes('PEITO') || itemUpper.includes('ASA') || itemUpper.includes('SASSAMI')) return '\u{1F414}'; // 🐔
-  if (itemUpper.includes('PORCO') || itemUpper.includes('LINGUIÇA') || itemUpper.includes('BACON') || itemUpper.includes('BISTECA') || itemUpper.includes('LOMBO') || itemUpper.includes('CALABRESA')) return '\u{1F416}'; // 🐖
-  if (itemUpper.includes('PEIXE') || itemUpper.includes('TILAPIA') || itemUpper.includes('TILÁPIA') || itemUpper.includes('CAMARÃO')) return '\u{1F41F}'; // 🐟
-  if (itemUpper.includes('CERVEJA') || itemUpper.includes('CHOPP') || itemUpper.includes('LATA') || itemUpper.includes('GARRAFA') || itemUpper.includes('HEINEKEN') || itemUpper.includes('AMSTEL') || itemUpper.includes('BRAHMA')) return '\u{1F37A}'; // 🍺
-  if (itemUpper.includes('COCA') || itemUpper.includes('GUARANÁ') || itemUpper.includes('REFRIGERANTE') || itemUpper.includes('SUCO') || itemUpper.includes('AGUA') || itemUpper.includes('ÁGUA') || itemUpper.includes('TONICA') || itemUpper.includes('TÔNICA')) return '\u{1F964}'; // 🥤
-  if (itemUpper.includes('QUEIJO') || itemUpper.includes('MUSSARELA') || itemUpper.includes('PARMESÃO') || itemUpper.includes('PROVOLONE') || itemUpper.includes('CATUPIRY')) return '\u{1F9C0}'; // 🧀
-  if (itemUpper.includes('PÃO') || itemUpper.includes('TORRADA') || itemUpper.includes('BAGUETE')) return '\u{1F35E}'; // 🍞
-  if (itemUpper.includes('TOMATE') || itemUpper.includes('ALFACE') || itemUpper.includes('CEBOLA') || itemUpper.includes('BATATA') || itemUpper.includes('ALHO') || itemUpper.includes('CHEIRO') || itemUpper.includes('VERDURA')) return '\u{1F96C}'; // 🥬
-  if (itemUpper.includes('ARROZ') || itemUpper.includes('FEIJÃO') || itemUpper.includes('FARINHA') || itemUpper.includes('OLEO') || itemUpper.includes('ÓLEO') || itemUpper.includes('AZEITE') || itemUpper.includes('SAL')) return '\u{1F4E6}'; // 📦
-  if (itemUpper.includes('DETERGENTE') || itemUpper.includes('SABÃO') || itemUpper.includes('PAPEL') || itemUpper.includes('GUARDANAPO') || itemUpper.includes('LIMPEZA') || itemUpper.includes('ÁLCOOL') || itemUpper.includes('ALCOOL')) return '\u{1F9F9}'; // 🧹
+  if (itemUpper.includes('BOI') || itemUpper.includes('COXÃO') || itemUpper.includes('ALCATRA') || itemUpper.includes('PICANHA') || itemUpper.includes('CARNE') || itemUpper.includes('COSTELA') || itemUpper.includes('CONTRA')) return '\u{1F402}';
+  if (itemUpper.includes('FRANGO') || itemUpper.includes('COXINHA') || itemUpper.includes('PEITO') || itemUpper.includes('ASA') || itemUpper.includes('SASSAMI')) return '\u{1F414}';
+  if (itemUpper.includes('PORCO') || itemUpper.includes('LINGUIÇA') || itemUpper.includes('BACON') || itemUpper.includes('BISTECA') || itemUpper.includes('LOMBO') || itemUpper.includes('CALABRESA')) return '\u{1F416}';
+  if (itemUpper.includes('PEIXE') || itemUpper.includes('TILAPIA') || itemUpper.includes('TILÁPIA') || itemUpper.includes('CAMARÃO')) return '\u{1F41F}';
+  if (itemUpper.includes('CERVEJA') || itemUpper.includes('CHOPP') || itemUpper.includes('LATA') || itemUpper.includes('GARRAFA') || itemUpper.includes('HEINEKEN') || itemUpper.includes('AMSTEL') || itemUpper.includes('BRAHMA')) return '\u{1F37A}';
+  if (itemUpper.includes('COCA') || itemUpper.includes('GUARANÁ') || itemUpper.includes('REFRIGERANTE') || itemUpper.includes('SUCO') || itemUpper.includes('AGUA') || itemUpper.includes('ÁGUA') || itemUpper.includes('TONICA') || itemUpper.includes('TÔNICA')) return '\u{1F964}';
+  if (itemUpper.includes('QUEIJO') || itemUpper.includes('MUSSARELA') || itemUpper.includes('PARMESÃO') || itemUpper.includes('PROVOLONE') || itemUpper.includes('CATUPIRY')) return '\u{1F9C0}';
+  if (itemUpper.includes('PÃO') || itemUpper.includes('TORRADA') || itemUpper.includes('BAGUETE')) return '\u{1F35E}';
+  if (itemUpper.includes('TOMATE') || itemUpper.includes('ALFACE') || itemUpper.includes('CEBOLA') || itemUpper.includes('BATATA') || itemUpper.includes('ALHO') || itemUpper.includes('CHEIRO') || itemUpper.includes('VERDURA')) return '\u{1F96C}';
+  if (itemUpper.includes('ARROZ') || itemUpper.includes('FEIJÃO') || itemUpper.includes('FARINHA') || itemUpper.includes('OLEO') || itemUpper.includes('ÓLEO') || itemUpper.includes('AZEITE') || itemUpper.includes('SAL')) return '\u{1F4E6}';
+  if (itemUpper.includes('DETERGENTE') || itemUpper.includes('SABÃO') || itemUpper.includes('PAPEL') || itemUpper.includes('GUARDANAPO') || itemUpper.includes('LIMPEZA') || itemUpper.includes('ÁLCOOL') || itemUpper.includes('ALCOOL')) return '\u{1F9F9}';
 
-  return '\u{1F539}'; // 🔹 Emoji padrão
+  return '\u{1F539}';
 }
 
-// Gera o texto formatado para exportação
-function geraringredienteTexto() {
-  const agora = new Date();
-  const dataFormatada = agora.toLocaleDateString('pt-BR');
-
-  let texto = "LISTA DE COMPRAS - CHOPERIA 737\n";
-  texto += `Data: ${dataFormatada}\n`;
-  texto += "-----------------------------------\n\n";
-
-  lista.forEach(item => {
-    const emoji = obterEmojiItem(item.nome);
-    const marcaTexto = item.marca ? ` (${item.marca})` : '';
-    texto += `${emoji} ${item.nome} - ${item.qtd} ${item.medida}${marcaTexto}\n`;
-  });
-
-  return texto;
-}
-
-// Formata e envia a lista no WhatsApp
+// Envia formatado no WhatsApp
 function enviarWhatsAppTexto() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de enviar!');
     return;
   }
 
-  const texto = geraringredienteTexto();
+  const agora = new Date();
+  const dataFormatada = agora.toLocaleDateString('pt-BR');
+  const nomeEmpresa = nomeEmpresaInput.value.trim().toUpperCase() || 'LISTA DE COMPRAS';
+
+  let texto = `*LISTA DE COMPRAS - ${nomeEmpresa}*\n`;
+  texto += `📅 *Data:* ${dataFormatada}\n`;
+  texto += "-----------------------------------\n\n";
+
+  lista.forEach(item => {
+    const emoji = obterEmojiItem(item.nome);
+    const marcaTexto = item.marca ? ` *(${item.marca})*` : '';
+    texto += `${emoji} *${item.nome}* - ${item.qtd} ${item.medida}${marcaTexto}\n`;
+  });
+
   localStorage.setItem('ultimaListaBackup', JSON.stringify(lista));
 
   const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
   window.location.href = url;
 }
 
-// Exporta a lista como arquivo .txt para o Bloco de Notas ou Compartilhamento do Sistema
-async function exportarBlocoDeNotas() {
+// Exporta a lista como Planilha CSV
+async function exportarPlanilhaCSV() {
   if (lista.length === 0) {
     exibirToast('Adicione itens antes de exportar!');
     return;
   }
 
-  const conteudo = geraringredienteTexto();
-  const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
-  const arquivo = new File([blob], 'lista_de_compras.txt', { type: 'text/plain' });
+  const agora = new Date();
+  const dataFormatada = agora.toLocaleDateString('pt-BR');
+  const dataArquivo = agora.toISOString().split('T')[0];
+  const nomeEmpresa = nomeEmpresaInput.value.trim().toUpperCase() || 'LISTA DE COMPRAS';
 
-  // Tenta usar o compartilhamento nativo do celular (para salvar no Keep, Bloco de Notas, etc.)
+  let csvConteudo = `LISTA DE COMPRAS - ${nomeEmpresa}\n`;
+  csvConteudo += `Data:;${dataFormatada}\n\n`;
+  csvConteudo += `Item;Quantidade;Unidade;Marca/Obs\n`;
+
+  lista.forEach(item => {
+    const marca = item.marca ? item.marca : '';
+    csvConteudo += `"${item.nome}";"${item.qtd}";"${item.medida}";"${marca}"\n`;
+  });
+
+  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const blob = new Blob([bom, csvConteudo], { type: 'text/csv;charset=utf-8;' });
+  
+  const nomeArquivo = `Lista_${nomeEmpresa.replace(/\s+/g, '_')}_${dataArquivo}.csv`;
+  const arquivo = new File([blob], nomeArquivo, { type: 'text/csv' });
+
   if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
     try {
       await navigator.share({
         files: [arquivo],
-        title: 'Lista de Compras',
-        text: 'Segue a lista de compras.'
+        title: `Planilha - ${nomeEmpresa}`,
+        text: `Segue a planilha da lista de compras do dia ${dataFormatada}.`
       });
     } catch (err) {
       if (err.name !== 'AbortError') {
-        fazerDownloadTxt(blob);
+        fazerDownloadPlanilha(blob, nomeArquivo);
       }
     }
   } else {
-    // Se for no computador ou navegador antigo, faz o download do arquivo .txt direto
-    fazerDownloadTxt(blob);
+    fazerDownloadPlanilha(blob, nomeArquivo);
   }
 }
 
-// Função auxiliar para baixar o arquivo .txt diretamente
-function fazerDownloadTxt(blob) {
+function fazerDownloadPlanilha(blob, nomeArquivo) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'lista_de_compras.txt';
+  a.download = nomeArquivo;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  exibirToast('Arquivo .txt gerado com sucesso!');
+  exibirToast('Planilha gerada com sucesso!');
 }
 
-// Troca dinâmica da imagem de fundo
 function alterarFundo(event) {
   const file = event.target.files[0];
   if (file) {
@@ -240,7 +244,6 @@ function alterarFundo(event) {
   }
 }
 
-// Restaura a imagem de fundo salva no carregamento
 const fundoSalvo = localStorage.getItem('imagemFundoCustom');
 if (fundoSalvo) {
   const container = document.querySelector('.container');
@@ -249,7 +252,6 @@ if (fundoSalvo) {
   }
 }
 
-// Exibe notificações rápidas estilo Toast na parte inferior
 function exibirToast(mensagem) {
   const toast = document.getElementById('toast');
   if (toast) {
