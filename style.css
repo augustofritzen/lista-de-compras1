@@ -233,6 +233,10 @@ input::placeholder {
   background-color: #1e7e34;
 }
 
+.btn-restaurar {
+  background-color: #0069d9;
+}
+
 /* Notificação Toast */
 .toast {
   visibility: hidden;
